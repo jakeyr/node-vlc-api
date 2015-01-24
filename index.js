@@ -23,6 +23,10 @@ var Client = module.exports = function (opts) {
     opts.port || 8080
   );
 
+  this._authHeader = util.format('Basic %s',
+    new Buffer(opts.username || '' + ':' + opts.password || '').toString('base64')
+  );
+
   // The rest of this constructor is defining all the convenience methods
   // that make this api useful. It may be nice to move this elsewhere. Unsure.
 
@@ -333,7 +337,10 @@ Client.prototype.request = function (resource, opts, cb) {
   request({
     method: 'GET',
     uri: client._resolve(resource),
-    qs: opts || {}
+    qs: opts || {},
+    headers: {
+      'Authorization' : this._authHeader
+    }
   }, function (err, res, body) {
     var json;
 
